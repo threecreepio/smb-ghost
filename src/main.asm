@@ -95,14 +95,62 @@
 ; allow line continuation feature
 .linecont +
 
+.macro bank_jsr bank, addr
+    sta $06
+    lda #<addr
+    sta $04
+    lda #>addr
+    sta $05
+    lda bank
+    jsr CallBank
+.endmacro
+
+
+.macro Footer bank
+.res $FFC0 - *, $FF
+SetBank:
+      sta $E000
+      lsr
+      sta $E000
+      lsr
+      sta $E000
+      lsr
+      sta $E000
+      lsr
+      sta $E000
+      rts
+
+CallBank:
+      pha
+      lda #bank
+      sta $06
+      pla
+      jsr SetBank
+      lda $06
+      pha
+      jsr @Inner
+      pla
+      jmp SetBank
+@Inner:
+      jmp ($04)
+
+.res $FFFA - *, $FF
+.word NonMaskableInterrupt
+.word Start2
+.word $fff0  ;unused
+.endmacro
+
 .segment "INES"
 .byte $4E,$45,$53,$1A
-.byte 2 ; prg
+.byte 4 ; prg
 .byte 1 ; chr
-.byte %00000001 ; flags 6
+.byte %00010011 ; flags 6
 
 .segment "SMBPRG"
 .include "smb.asm"
+
+.segment "SNDPRG"
+.include "sound.asm"
 
 .segment "SMBCHR"
 .incbin "../Super Mario Bros. (World).nes", $8010

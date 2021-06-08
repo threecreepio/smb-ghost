@@ -14979,12 +14979,41 @@ SetHFAt: ora $04                    ;add other OAM attributes if necessary
 ;-------------------------------------------------------------------------------------
 
 SoundEngine:
+      bank_jsr #0, InnerSoundEngine
       rts
+
+Start2:
+      lda #$FF
+      sta $8000
+      lda #2
+      sta $E000
+      lsr
+      sta $E000
+      lsr
+      sta $E000
+      lsr
+      sta $E000
+      lsr
+      sta $E000
+      lda #0
+      sta $A000
+      sta $A000
+      sta $A000
+      sta $A000
+      sta $A000
+      lda #2
+      sta $8000
+      lsr
+      sta $8000
+      lsr
+      sta $8000
+      lsr
+      sta $8000
+      lsr
+      sta $8000
+      jmp Start
 
 ;-------------------------------------------------------------------------------------
 ;INTERRUPT VECTORS
 
-.res $FFFA - *, $FF
-      .word NonMaskableInterrupt
-      .word Start
-      .word $fff0  ;unused
+Footer $2

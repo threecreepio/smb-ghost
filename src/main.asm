@@ -107,7 +107,7 @@
 
 
 .macro Footer bank
-.res $FFC0 - *, $FF
+.res $FFD0 - *, $FF
 SetBank:
       sta $E000
       lsr
@@ -142,7 +142,7 @@ CallBank:
 
 .segment "INES"
 .byte $4E,$45,$53,$1A
-.byte 4 ; prg
+.byte 6 ; prg
 .byte 1 ; chr
 .byte %00010011 ; flags 6
 
@@ -151,6 +151,9 @@ CallBank:
 
 .segment "SNDPRG"
 .include "sound.asm"
+
+.segment "GHOSTPRG"
+.include "ghost.asm"
 
 .segment "SMBCHR"
 .incbin "../Super Mario Bros. (World).nes", $8010

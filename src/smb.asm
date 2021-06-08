@@ -814,7 +814,9 @@ SkipSprite0:   lda HorizontalScroll      ;set scroll registers from variables
                lsr
                bcs SkipMainOper
                jsr OperModeExecutionTree ;otherwise do one of many, many possible subroutines
-SkipMainOper:  lda PPU_STATUS            ;reset flip-flop
+SkipMainOper:  
+               jsr EnterGhost
+               lda PPU_STATUS            ;reset flip-flop
                pla
                ora #%10000000            ;reactivate NMIs
                sta PPU_CTRL_REG1
@@ -1011,7 +1013,9 @@ ChkContinue:  ldy DemoTimer               ;if timer for demo has expired, reset 
               bcc StartWorld1             ;if not, don't load continue function's world number
               lda ContinueWorld           ;load previously saved world number for secret
               jsr GoContinue              ;continue function when pressing A + start
-StartWorld1:  jsr LoadAreaPointer
+StartWorld1:
+              jsr EnterGhostInit
+              jsr LoadAreaPointer
               inc Hidden1UpFlag           ;set 1-up box flag for both players
               inc OffScr_Hidden1UpFlag
               inc FetchNewGameTimerFlag   ;set fetch new game timer flag
@@ -4322,6 +4326,7 @@ FindAreaPointer:
 
 GetAreaDataAddrs:
             lda AreaPointer          ;use 2 MSB for Y
+            sta LoadedAreaPointer
             jsr GetAreaType
             tay
             lda AreaPointer          ;mask out all but 5 LSB
@@ -14980,6 +14985,14 @@ SetHFAt: ora $04                    ;add other OAM attributes if necessary
 
 SoundEngine:
       bank_jsr #0, InnerSoundEngine
+      rts
+
+EnterGhost:
+      bank_jsr #4, Ghost
+      rts
+
+EnterGhostInit:
+      bank_jsr #4, GhostInit
       rts
 
 Start2:
